@@ -1,33 +1,132 @@
- <!DOCTYPE html>
-<html>
+
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <title>Input Harga</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Input Harga</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0e1a35;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #1f2e4a;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.7rem;
+      margin-top: 0.3rem;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      background-color: #3cb371;
+      color: white;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #2e9b5e;
+    }
+
+    .message {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
-  <h2>Form Input Harga</h2>
-  <form id="formHarga">
-    <label>Tanggal: </label><input type="date" id="tanggal"><br>
-    <label>Jenis: </label><input type="text" id="jenis"><br>
-    <label>Harga Beli: </label><input type="number" id="beli"><br>
-    <label>Harga Jual: </label><input type="number" id="jual"><br>
-    <button type="submit">Generate JSON</button>
-  </form>
-
-  <h3>Hasil JSON (Copy ke Web 1)</h3>
-  <textarea id="output" rows="10" cols="50"></textarea>
+  <div class="container">
+    <h2>Input Harga</h2>
+    <label for="tanggal">Tanggal</label>
+    <input type="date" id="tanggal" required />
+    
+    <label for="harga">Harga</label>
+    <input type="number" id="harga" placeholder="Masukkan harga..." required />
+    
+    <button onclick="kirimData()">Kirim</button>
+    <div class="message" id="pesan"></div>
+  </div>
 
   <script>
-    document.getElementById("formHarga").addEventListener("submit", function (e) {
-      e.preventDefault();
+    function kirimData() {
+      const tanggal = document.getElementById("tanggal").value;
+      const harga = document.getElementById("harga").value;
+      const pesan = document.getElementById("pesan");
+
+      if (!tanggal || !harga) {
+        pesan.textContent = "Isi semua data!";
+        pesan.style.color = "orange";
+        return;
+      }
+
       const data = {
-        tanggal: document.getElementById("tanggal").value,
-        jenis: document.getElementById("jenis").value,
-        beli: parseInt(document.getElementById("beli").value),
-        jual: parseInt(document.getElementById("jual").value)
+        tanggal: tanggal,
+        harga: parseInt(harga)
       };
 
-      document.getElementById("output").value = JSON.stringify(data, null, 2);
-    });
+      // Ganti URL ini dengan URL Firebase kamu
+      const url = "https://dataku-40827-default-rtdb.asia-southeast1.firebasedatabase.app/harga.json";
+
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => {
+        if (res.ok) {
+          pesan.textContent = "Berhasil disimpan!";
+          pesan.style.color = "lightgreen";
+          document.getElementById("harga").value = "";
+        } else {
+          pesan.textContent = "Gagal menyimpan!";
+          pesan.style.color = "red";
+        }
+      })
+      .catch(() => {
+        pesan.textContent = "Terjadi kesalahan!";
+        pesan.style.color = "red";
+      });
+    }
   </script>
 </body>
 </html>
